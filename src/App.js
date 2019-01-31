@@ -1,28 +1,41 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {Component} from 'react'
+import {connect} from "react-redux"
+import TodoList from "./TodoList"
 
 class App extends Component {
+  componentDidMount() {
+    window.addTodo = todo => this.props.addTodo(todo)
+
+    window.completeTodo = id => this.props.completeTodo(id)
+
+    window.uncompleteTodo = id => this.props.uncompleteTodo(id)
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div>
+        <TodoList title="Uncomplete Todos" todos={this.props.uncompletedTodos}/>
+        <TodoList title="Complete Todos" todos={this.props.completedTodos}/>
       </div>
-    );
+    )
   }
 }
 
-export default App;
+function mapStateToProps(state) {
+  console.log(state)
+
+  return {
+    uncompletedTodos: state.todos.filter(todo => !todo.completed),
+    completedTodos: state.todos.filter(todo => todo.completed)
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    addTodo: todo => dispatch({type: 'ADD_TODO', payload: todo}),
+    completeTodo: id => dispatch({type: 'COMPLETE_TODO', payload: id}),
+    uncompleteTodo: id => dispatch({type: 'UNCOMPLETE_TODO', payload: id}),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)
